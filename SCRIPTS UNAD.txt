@@ -1,0 +1,228 @@
+CREATE DATABASE UNAD; 
+USE UNAD; 
+-- Crear tabla ZONAS
+CREATE TABLE ZONAS (
+    ID_ZONA INT PRIMARY KEY,
+    NOMBRE_ZONA VARCHAR(100)
+);
+
+-- Crear tabla PROGRAMAS
+CREATE TABLE PROGRAMAS (
+    ID_PROGRAMA INT PRIMARY KEY,
+    NOMBRE_PROGRAMA VARCHAR(100)
+);
+
+-- Crear tabla CCAV_OR_CEAD
+CREATE TABLE CCAV_OR_CEAD (
+    ID_CCAV_OR_CEAD INT PRIMARY KEY,
+    NOMBRE VARCHAR(100)
+);
+
+-- Crear tabla FORMACION_PROFESIONAL
+CREATE TABLE FORMACION_PROFESIONAL (
+    ID_FORMACION INT PRIMARY KEY,
+    NOMBRE_FORMACION VARCHAR(100)
+);
+
+-- Crear tabla PAGOS
+CREATE TABLE PAGOS (
+    ID_PAGO INT PRIMARY KEY,
+    VALOR_FORMACION DECIMAL(10, 2),
+    ID_FORMACION INT,
+    FOREIGN KEY (ID_FORMACION) REFERENCES FORMACION_PROFESIONAL(ID_FORMACION)
+);
+
+-- Crear tabla TUTORES
+CREATE TABLE TUTORES (
+    ID_TUTOR INT PRIMARY KEY,
+    NOMBRE VARCHAR(100),
+    ID_CCAV_OR_CEAD INT,
+    ID_FORMACION INT,
+    FOREIGN KEY (ID_CCAV_OR_CEAD) REFERENCES CCAV_OR_CEAD(ID_CCAV_OR_CEAD),
+    FOREIGN KEY (ID_FORMACION) REFERENCES FORMACION_PROFESIONAL(ID_FORMACION)
+);
+
+-- Crear tabla CURSOS
+CREATE TABLE CURSOS (
+    ID_CURSO INT PRIMARY KEY,
+    NOMBRE_CURSO VARCHAR(100),
+    ID_TUTOR INT,
+    FOREIGN KEY (ID_TUTOR) REFERENCES TUTORES(ID_TUTOR)
+);
+
+-- Crear tabla ESTUDIANTES
+CREATE TABLE ESTUDIANTES (
+    ID_ESTUDIANTE INT PRIMARY KEY,
+    NOMBRE VARCHAR(100),
+    DIRECCION VARCHAR(200),
+    TELEFONO VARCHAR(20),
+    EDAD INT,
+    GENERO CHAR(1),
+    ESCUELA VARCHAR(100),
+    SEMESTRE INT,
+    ID_PROGRAMA INT,
+    ID_ZONA INT,
+    ID_CCAV_OR_CEAD INT,
+    FOREIGN KEY (ID_PROGRAMA) REFERENCES PROGRAMAS(ID_PROGRAMA),
+    FOREIGN KEY (ID_ZONA) REFERENCES ZONAS(ID_ZONA),
+    FOREIGN KEY (ID_CCAV_OR_CEAD) REFERENCES CCAV_OR_CEAD(ID_CCAV_OR_CEAD)
+);
+
+-- Crear tabla CURSOS_MATRICULADOS
+CREATE TABLE CURSOS_MATRICULADOS (
+    ID_CURSO INT,
+    ID_ESTUDIANTE INT,
+    PRIMARY KEY (ID_CURSO, ID_ESTUDIANTE),
+    FOREIGN KEY (ID_CURSO) REFERENCES CURSOS(ID_CURSO),
+    FOREIGN KEY (ID_ESTUDIANTE) REFERENCES ESTUDIANTES(ID_ESTUDIANTE)
+);
+
+
+-- POBLANDO LAS TABLAS
+
+-- Tabla Zonas
+INSERT INTO ZONAS (ID_ZONA, NOMBRE_ZONA) VALUES
+(1, 'ZAO'),
+(2, 'ZCAR'),
+(3, 'ZCBC'),
+(4, 'ZBOY'),
+(5, 'ZCORI'),
+(6, 'ZCSUR'),
+(7, 'ZOCC'),
+(8, 'ZSUR');
+
+-- Tabla Programas
+INSERT INTO PROGRAMAS (ID_PROGRAMA, NOMBRE_PROGRAMA) VALUES
+(1, 'Economía'),
+(2, 'Ingeniería de Sistemas'),
+(3, 'Psicología');
+
+-- Tabla de CCAV or CEAD
+INSERT INTO CCAV_OR_CEAD (ID_CCAV_OR_CEAD, NOMBRE) VALUES
+(1, 'Bogotá'),
+(2, 'Gachetá'),
+(3, 'Girardot'),
+(4, 'Arbeláez'),
+(5, 'Fusagasugá'),
+(6, 'Facatativá'),
+(7, 'Zipaquirá'),
+(8, 'Tunja'),
+(9, 'Chiquinquirá'),
+(10, 'Duitama'),
+(11, 'Sogamoso'),
+(12, 'Soatá'),
+(13, 'Garagoa'),
+(14, 'Medellín'),
+(15, 'La Dorada'),
+(16, 'Turbo'),
+(17, 'Quibdó'),
+(18, 'Dosquebradas');
+
+
+-- Tabla Formación Profesional
+INSERT INTO FORMACION_PROFESIONAL (ID_FORMACION, NOMBRE_FORMACION) VALUES
+(1, 'Profesional'),
+(2, 'Universitaria'),
+(3, 'Especialista');
+
+-- Pagos
+INSERT INTO PAGOS (ID_PAGO, VALOR_FORMACION, ID_FORMACION) VALUES
+(1, 1500000, 1),
+(2, 2000000, 2),
+(3, 1800000, 3);
+
+-- Tutores
+INSERT INTO TUTORES (ID_TUTOR, NOMBRE, ID_CCAV_OR_CEAD, ID_FORMACION) VALUES
+(10, 'Juan Pérez', 1, 3),
+(20, 'María Gómez', 18, 1),
+(30, 'Carlos López', 14, 3);
+
+-- Cursos
+INSERT INTO CURSOS (ID_CURSO, NOMBRE_CURSO, ID_TUTOR) VALUES
+(1001, 'Introducción a la economía', 10),
+(2002, 'Redes y comunicaciones', 20),
+(3003, 'Psicología del desarrollo', 30);
+
+-- Estudiantes
+INSERT INTO ESTUDIANTES (ID_ESTUDIANTE, NOMBRE, DIRECCION, TELEFONO, EDAD, GENERO, ESCUELA, SEMESTRE, ID_PROGRAMA, ID_ZONA, ID_CCAV_OR_CEAD) VALUES
+(1, 'Ana Martínez', 'Calle 123, Bogotá', '123456789', 20, 'F', 'ECBTI', 2, 2, 3, 1),
+(2, 'Pedro Rodríguez', 'Carrera 456, Medellín', '987654321', 22, 'M', 'ECSAH', 3, 3, 7, 14),
+(3, 'Laura González', 'Avenida Principal, Tunja', '555555555', 25, 'F', 'ECACEN', 4, 1, 4, 18);
+
+-- Cursos Matriculados
+INSERT INTO CURSOS_MATRICULADOS (ID_CURSO, ID_ESTUDIANTE) VALUES
+(1001, 1),
+(2002, 2),
+(3003, 3);
+
+
+
+/*
+========================== Consultas ====================================
+
+1. Obtener el nombre y la dirección de los estudiantes matriculados
+en un determinado CCAV junto con el nombre del tutor asignado a cada uno 
+de los cursos en los que están matriculados */
+
+SELECT 
+    e.Nombre AS Nombre_Estudiante,
+    e.Direccion AS Direccion_Estudiante,
+    c.Nombre_Curso AS Curso,
+    t.Nombre AS Nombre_Tutor
+FROM 
+    ESTUDIANTES e
+JOIN 
+    CURSOS_MATRICULADOS cm ON e.ID_ESTUDIANTE = cm.ID_ESTUDIANTE
+JOIN 
+    CURSOS c ON cm.ID_CURSO = c.ID_CURSO
+JOIN 
+    TUTORES t ON c.ID_TUTOR = t.ID_TUTOR
+WHERE 
+    e.ID_CCAV_OR_CEAD = '1';
+
+/*
+2. Calcular el monto total pagado a los tutores 
+por cada nivel de formación profesional */
+
+SELECT 
+    fp.NOMBRE_FORMACION AS Formacion_Profesional,
+    SUM(p.VALOR_FORMACION) AS Total_Pagado
+FROM 
+    TUTORES t
+JOIN 
+    FORMACION_PROFESIONAL fp ON t.ID_FORMACION = fp.ID_FORMACION
+JOIN 
+    PAGOS p ON fp.ID_FORMACION = p.ID_FORMACION
+GROUP BY 
+    fp.NOMBRE_FORMACION;
+
+
+
+/*
+================================= Transacciones ==========================================
+
+1. Esta consulta selecciona el nombre del estudiante de la tabla ESTUDIANTES, 
+el nombre del curso de la tabla CURSOS, y los une mediante las tablas CURSOS_MATRICULADOS 
+que relaciona a los estudiantes con los cursos en los que están matriculados.
+*/ 
+
+
+
+SELECT E.NOMBRE AS NOMBRE_ESTUDIANTE, C.NOMBRE_CURSO
+FROM ESTUDIANTES E
+INNER JOIN CURSOS_MATRICULADOS CM ON E.ID_ESTUDIANTE = CM.ID_ESTUDIANTE
+INNER JOIN CURSOS C ON CM.ID_CURSO = C.ID_CURSO;
+
+
+
+/*
+2. Transacción que seleccion el nombre del estudiante, el curso y el tutor encargado
+de ese curso. 
+*/
+
+SELECT E.NOMBRE AS NOMBRE_ESTUDIANTE, T.NOMBRE AS NOMBRE_TUTOR, C.NOMBRE_CURSO
+FROM ESTUDIANTES E
+INNER JOIN CURSOS_MATRICULADOS CM ON E.ID_ESTUDIANTE = CM.ID_ESTUDIANTE
+INNER JOIN CURSOS C ON CM.ID_CURSO = C.ID_CURSO
+INNER JOIN TUTORES T ON C.ID_TUTOR = T.ID_TUTOR;
+
